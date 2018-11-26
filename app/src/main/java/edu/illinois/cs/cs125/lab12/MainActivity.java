@@ -1,4 +1,4 @@
-package edu.illinois.cs.cs125.lab11;
+package edu.illinois.cs.cs125.lab12;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +21,7 @@ import org.json.JSONObject;
  */
 public final class MainActivity extends AppCompatActivity {
     /** Default logging tag for messages from the main activity. */
-    private static final String TAG = "Lab11:Main";
+    private static final String TAG = "Lab12:Main";
 
     /** Request queue for our network requests. */
     private static RequestQueue requestQueue;
