@@ -5,8 +5,10 @@ import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -18,7 +20,6 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 
@@ -32,10 +33,14 @@ public final class MainActivity extends AppCompatActivity {
     /** Request queue for our network requests. */
     private static RequestQueue requestQueue;
 
-    /**
-     * hi.
-     */
+    /** The joke from the API call is stored here. */
     private String joke = "THERE IS NO JOKE!";
+
+    /** The joke from the spinner dropdown menu is stored here. */
+    private String jokeType = "THERE IS NO JOKE TYPE!";
+
+    /** Types of jokes to get. */
+    private final String[] jokeTypes = new String[]{"Nerdy", "Explicit", "All"};
 
     /**
      * Reader guy.
@@ -53,8 +58,9 @@ public final class MainActivity extends AppCompatActivity {
 
         // Set up a queue for our Volley requests, start first request
         requestQueue = Volley.newRequestQueue(this);
-        startAPICall();
+        getChuckJoke();
 
+        // Bob will be our TextToSpeech spokesperson today
         bobTheReader = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(final int status) {
@@ -71,32 +77,48 @@ public final class MainActivity extends AppCompatActivity {
         final TextView jokeTextView = findViewById(R.id.jokeTextView);
         jokeTextView.setText("Press the button for a joke!");
 
-        // Attach the handler to our UI button
-        final Button startAPICall = findViewById(R.id.startAPICall);
-        startAPICall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                Log.d(TAG, "Start API button clicked");
-                // show the joke from the previous click and get a new one
-                jokeTextView.setText(joke);
-                bobTheReader.speak(joke, TextToSpeech.QUEUE_FLUSH, null);
-                startAPICall();
-            }
-        });
+        final Spinner dropdown = findViewById(R.id.jokeTypeSpinner);
+        ArrayAdapter<String> adapter
+                = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, jokeTypes);
+        dropdown.setAdapter(adapter);
 
         // Make sure that our progress bar isn't spinning and style it a bit
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
+
+        // Attach the handler to our UI button
+        final Button jokeButton = findViewById(R.id.jokeButton);
+        jokeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                Log.d(TAG, "Start API button clicked");
+                jokeType = dropdown.getSelectedItem().toString();   //TODO FIX TIMING ERROR!!!!!!!!!!!!!!!!!
+                getChuckJoke();
+                jokeTextView.setText(joke);
+                bobTheReader.speak(joke, TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
     }
 
-    /**
-     * Make an API call.
+    /** Get the extension for the web api joke based on the type selected in Spinner.
+     * @return
      */
-    void startAPICall() {
+    private String getJokeTypeExtension() {
+        if (jokeType == "Nerdy") {
+            return "limitTo=[nerdy]";
+        }
+        if (jokeType == "Explicit") {
+            return "limitTo=[explicit]";
+        }
+        return "";
+    }
+
+    /** Make an API call.*/
+    private void getChuckJoke() {
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
-                    "http://api.icndb.com/jokes/random?limitTo=[nerdy]",
+                    "http://api.icndb.com/jokes/random?" + getJokeTypeExtension(),
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
