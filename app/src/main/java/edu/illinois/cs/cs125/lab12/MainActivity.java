@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -113,10 +114,14 @@ public final class MainActivity extends AppCompatActivity {
                 getChuckJoke();
             }
         });
+
+        final ImageView chuckImageView = findViewById(R.id.chuckImageView);
+        int imageResource = getResources().getIdentifier("@drawable/chuck", null, this.getPackageName());
+        chuckImageView.setImageResource(imageResource);
     }
 
     /** Get the extension for the web api joke based on the type selected in Spinner.
-     * @return extension for the oke
+     * @return extension for the joke
      */
     private String getJokeTypeExtension() {
         if (currentJokeType.equals(jokeTypes[0])) {
@@ -144,7 +149,7 @@ public final class MainActivity extends AppCompatActivity {
                             try {
                                 JSONObject value = response.getJSONObject("value");
                                 joke = value.getString("joke").replaceAll("&quot;", "\"");
-                                Log.d(TAG, "Queued a " + currentJokeType + " joke from the api");
+                                Log.d(TAG, "Queued a " + currentJokeType + "joke from the api");
                             } catch (Exception e) {
                                 Log.d(TAG, "OOF! COULD NOT GET JOKE:\n" + e.toString());
                             }

@@ -24,7 +24,7 @@
         <TextView
             android:id="@+id/jokeTextView"
             android:layout_width="match_parent"
-            android:layout_height="145dp"
+            android:layout_height="119dp"
             android:layout_margin="20dp"
             android:gravity="center"
             android:text="hi"
@@ -43,10 +43,10 @@
             android:text="Get Joke" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/chuckImageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@color/colorPrimaryDark" />
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     </LinearLayout>
 </FrameLayout>
