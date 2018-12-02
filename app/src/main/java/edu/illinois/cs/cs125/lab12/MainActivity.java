@@ -68,7 +68,7 @@ public final class MainActivity extends AppCompatActivity {
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
-                            Log.d(TAG, response.                toString());
+                            Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
                         @Override
