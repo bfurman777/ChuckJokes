@@ -43,9 +43,7 @@ public final class MainActivity extends AppCompatActivity {
     /** Types of jokes to get. */
     private final String[] jokeTypes = new String[]{"Nerdy", "Explicit", "All"};
 
-    /**
-     * Reader guy.
-     */
+    /** Reader guy. */
     private TextToSpeech bobTheReader;
 
     /**
@@ -59,7 +57,6 @@ public final class MainActivity extends AppCompatActivity {
 
         // Set up a queue for our Volley requests, start first request
         requestQueue = Volley.newRequestQueue(this);
-        getChuckJoke();
 
         // Bob will be our TextToSpeech spokesperson today
         bobTheReader = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -89,6 +86,7 @@ public final class MainActivity extends AppCompatActivity {
             public void onItemSelected(final AdapterView<?> parentView,
                                        final View selectedItemView, final int position, final long id) {
                 currentJokeType = dropdown.getSelectedItem().toString();
+                Log.d(TAG, "Joke type has been changed to " + currentJokeType + " -> new joke queued");
                 getChuckJoke();
             }
 
@@ -133,7 +131,7 @@ public final class MainActivity extends AppCompatActivity {
         return "";
     }
 
-    /** Make an API call.*/
+    /** Make an API call to The Internet Chuck Norris Database.*/
     private void getChuckJoke() {
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -144,18 +142,17 @@ public final class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(final JSONObject response) {
                             try {
-
                                 JSONObject value = response.getJSONObject("value");
                                 joke = value.getString("joke").replaceAll("&quot;", "\"");
+                                Log.d(TAG, "Queued a " + currentJokeType + " joke from the api");
                             } catch (Exception e) {
-                                Log.d(TAG, "OOF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" + e.toString());
+                                Log.d(TAG, "OOF! COULD NOT GET JOKE:\n" + e.toString());
                             }
-                            //Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(final VolleyError error) {
-                            Log.w(TAG, error.toString());
+                            Log.w(TAG, "COULD NOT GET JOKE:\n" + error.toString());
                         }
                     });
             requestQueue.add(jsonObjectRequest);
