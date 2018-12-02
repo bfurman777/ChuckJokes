@@ -1,11 +1,13 @@
 package edu.illinois.cs.cs125.lab12;
 
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -15,6 +17,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.Locale;
+
 
 /**
  * Main screen for our API testing app.
@@ -27,6 +33,14 @@ public final class MainActivity extends AppCompatActivity {
     private static RequestQueue requestQueue;
 
     /**
+     * hi.
+     */
+    private String joke = "THERE IS NO JOKE!";
+
+    /**
+     * Reader guy
+     */
+    /**
      * Run when our activity comes into view.
      *
      * @param savedInstanceState state that was saved by the activity last time it was paused
@@ -35,11 +49,18 @@ public final class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Set up a queue for our Volley requests
+        // Set up a queue for our Volley requests, start first request
         requestQueue = Volley.newRequestQueue(this);
+        startAPICall();
+
+
+
 
         // Load the main layout for our activity
         setContentView(R.layout.activity_main);
+
+        final TextView jokeTextView = findViewById(R.id.jokeTextView);
+        jokeTextView.setText("Press the button for a joke!");
 
         // Attach the handler to our UI button
         final Button startAPICall = findViewById(R.id.startAPICall);
@@ -47,6 +68,8 @@ public final class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(final View v) {
                 Log.d(TAG, "Start API button clicked");
+                // show the joke from the previous click and get a new one
+                jokeTextView.setText(joke);
                 startAPICall();
             }
         });
@@ -63,12 +86,19 @@ public final class MainActivity extends AppCompatActivity {
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
-                    "http://api.icndb.com/jokes/random?exclude=[explicit]",
+                    "http://api.icndb.com/jokes/random?limitTo=[nerdy]",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
-                            Log.d(TAG, response.toString());
+                            try {
+
+                                JSONObject value = response.getJSONObject("value");
+                                joke = value.getString("joke").replaceAll("&quot;", "\"");
+                            } catch (Exception e) {
+                                Log.d(TAG, "OOF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" + e.toString());
+                            }
+                            //Log.d(TAG, response.toString());
                         }
                     }, new Response.ErrorListener() {
                         @Override
