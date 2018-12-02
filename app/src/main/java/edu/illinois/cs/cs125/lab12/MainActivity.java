@@ -38,8 +38,10 @@ public final class MainActivity extends AppCompatActivity {
     private String joke = "THERE IS NO JOKE!";
 
     /**
-     * Reader guy
+     * Reader guy.
      */
+    private TextToSpeech bobTheReader;
+
     /**
      * Run when our activity comes into view.
      *
@@ -53,7 +55,14 @@ public final class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         startAPICall();
 
-
+        bobTheReader = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(final int status) {
+                if (status != TextToSpeech.ERROR) {
+                    bobTheReader.setLanguage(Locale.UK);
+                }
+            }
+        });
 
 
         // Load the main layout for our activity
@@ -70,6 +79,7 @@ public final class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Start API button clicked");
                 // show the joke from the previous click and get a new one
                 jokeTextView.setText(joke);
+                bobTheReader.speak(joke, TextToSpeech.QUEUE_FLUSH, null);
                 startAPICall();
             }
         });
