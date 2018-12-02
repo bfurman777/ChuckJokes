@@ -117,6 +117,7 @@ public final class MainActivity extends AppCompatActivity {
             public void onClick(final View v) {
                 // show and speak the pre-obtained joke, then generate the next one
                 Log.d(TAG, "Chuck Joke button clicked");
+                bobTheReader.stop();
                 jokeTextView.setText(joke);
                 bobTheReader.speak(joke, TextToSpeech.QUEUE_FLUSH, null);
                 currentJokeType = dropdown.getSelectedItem().toString();
