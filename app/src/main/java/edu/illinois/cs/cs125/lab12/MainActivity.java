@@ -63,12 +63,12 @@ public final class MainActivity extends AppCompatActivity {
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
-                    "",
+                    "http://api.icndb.com/jokes/random?exclude=[explicit]",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
-                            Log.d(TAG, response.toString());
+                            Log.d(TAG, response.                toString());
                         }
                     }, new Response.ErrorListener() {
                         @Override
