@@ -5,6 +5,7 @@ import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -37,7 +38,7 @@ public final class MainActivity extends AppCompatActivity {
     private String joke = "THERE IS NO JOKE!";
 
     /** The joke from the spinner dropdown menu is stored here. */
-    private String jokeType = "THERE IS NO JOKE TYPE!";
+    private String currentJokeType = "THERE IS NO JOKE TYPE!";
 
     /** Types of jokes to get. */
     private final String[] jokeTypes = new String[]{"Nerdy", "Explicit", "All"};
@@ -65,7 +66,7 @@ public final class MainActivity extends AppCompatActivity {
             @Override
             public void onInit(final int status) {
                 if (status != TextToSpeech.ERROR) {
-                    bobTheReader.setLanguage(Locale.UK);
+                    bobTheReader.setLanguage(Locale.ENGLISH);
                 }
             }
         });
@@ -82,6 +83,21 @@ public final class MainActivity extends AppCompatActivity {
                 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, jokeTypes);
         dropdown.setAdapter(adapter);
 
+        // when the dropdown is changed, generate a new joke in the background
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(final AdapterView<?> parentView,
+                                       final View selectedItemView, final int position, final long id) {
+                currentJokeType = dropdown.getSelectedItem().toString();
+                getChuckJoke();
+            }
+
+            @Override
+            public void onNothingSelected(final AdapterView<?> parentView) {
+                // your code here
+            }
+        });
+
         // Make sure that our progress bar isn't spinning and style it a bit
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
@@ -91,24 +107,28 @@ public final class MainActivity extends AppCompatActivity {
         jokeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Log.d(TAG, "Start API button clicked");
-                jokeType = dropdown.getSelectedItem().toString();   //TODO FIX TIMING ERROR!!!!!!!!!!!!!!!!!
-                getChuckJoke();
+                // show and speak the pre-obtained joke, then generate the next one
+                Log.d(TAG, "Chuck Joke button clicked");
                 jokeTextView.setText(joke);
                 bobTheReader.speak(joke, TextToSpeech.QUEUE_FLUSH, null);
+                currentJokeType = dropdown.getSelectedItem().toString();
+                getChuckJoke();
             }
         });
     }
 
     /** Get the extension for the web api joke based on the type selected in Spinner.
-     * @return
+     * @return extension for the oke
      */
     private String getJokeTypeExtension() {
-        if (jokeType == "Nerdy") {
+        if (currentJokeType.equals(jokeTypes[0])) {
             return "limitTo=[nerdy]";
         }
-        if (jokeType == "Explicit") {
+        if (currentJokeType.equals(jokeTypes[1])) {
             return "limitTo=[explicit]";
+        }
+        if (currentJokeType.equals(jokeTypes[2])) {
+            return "exclude=[nerdy,explicit]";
         }
         return "";
     }
