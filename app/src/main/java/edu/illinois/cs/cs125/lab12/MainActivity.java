@@ -47,6 +47,12 @@ public final class MainActivity extends AppCompatActivity {
     /** Reader guy. */
     private TextToSpeech bobTheReader;
 
+    /** First name to replace "Chuck". */
+    private String firstName = "Chuck";
+
+    /** Last name to replace "Norris". */
+    private String lastName = "Norris";
+
     /**
      * Run when our activity comes into view.
      *
@@ -118,6 +124,16 @@ public final class MainActivity extends AppCompatActivity {
         final ImageView chuckImageView = findViewById(R.id.chuckImageView);
         int imageResource = getResources().getIdentifier("@drawable/chuck", null, this.getPackageName());
         chuckImageView.setImageResource(imageResource);
+        chuckImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                // show and speak the pre-obtained joke, then generate the next one
+                Log.d(TAG, "SECRET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                firstName = "Bob";
+                lastName = "Dold";
+                getChuckJoke();
+            }
+        });
     }
 
     /** Get the extension for the web api joke based on the type selected in Spinner.
@@ -148,7 +164,11 @@ public final class MainActivity extends AppCompatActivity {
                         public void onResponse(final JSONObject response) {
                             try {
                                 JSONObject value = response.getJSONObject("value");
-                                joke = value.getString("joke").replaceAll("&quot;", "\"");
+                                joke = value.getString("joke").replaceAll("&quot;", "\"")
+                                        .replaceAll("Chuck", firstName)
+                                        .replaceAll("Norris", lastName)
+                                        .replaceAll("chuck", firstName.toLowerCase())
+                                        .replaceAll("norris", lastName.toLowerCase());
                                 Log.d(TAG, "Queued a " + currentJokeType + "joke from the api");
                             } catch (Exception e) {
                                 Log.d(TAG, "OOF! COULD NOT GET JOKE:\n" + e.toString());
