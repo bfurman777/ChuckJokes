@@ -35,7 +35,7 @@
             android:id="@+id/startAPICall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Send Joke" />
+            android:text="Get Joke" />
 
         <ScrollView
             android:layout_width="match_parent"
