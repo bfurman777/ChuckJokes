@@ -1,14 +1,18 @@
 package edu.illinois.cs.cs125.lab12;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -75,7 +79,6 @@ public final class MainActivity extends AppCompatActivity {
             }
         });
 
-
         // Load the main layout for our activity
         setContentView(R.layout.activity_main);
 
@@ -124,14 +127,46 @@ public final class MainActivity extends AppCompatActivity {
         final ImageView chuckImageView = findViewById(R.id.chuckImageView);
         int imageResource = getResources().getIdentifier("@drawable/chuck", null, this.getPackageName());
         chuckImageView.setImageResource(imageResource);
-        chuckImageView.setOnClickListener(new View.OnClickListener() {
+        chuckImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(final View v) {
+            public boolean onLongClick(final View v) {
                 // show and speak the pre-obtained joke, then generate the next one
-                Log.d(TAG, "SECRET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                firstName = "Bob";
-                lastName = "Dold";
-                getChuckJoke();
+                Log.d(TAG, "SECRET NAME CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                LinearLayout layout = new LinearLayout(MainActivity.this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Set the Name:");
+
+                final EditText firstNameInput = new EditText(MainActivity.this);
+                firstNameInput.setHint("First Name");
+                layout.addView(firstNameInput);
+
+                final EditText lastNameInput = new EditText(MainActivity.this);
+                lastNameInput.setHint("Last Name");
+                layout.addView(lastNameInput);
+
+                builder.setView(layout);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        firstName = firstNameInput.getText().toString();
+                        lastName = lastNameInput.getText().toString();
+                        getChuckJoke();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+                return true;
             }
         });
     }
@@ -164,12 +199,17 @@ public final class MainActivity extends AppCompatActivity {
                         public void onResponse(final JSONObject response) {
                             try {
                                 JSONObject value = response.getJSONObject("value");
-                                joke = value.getString("joke").replaceAll("&quot;", "\"")
-                                        .replaceAll("Chuck", firstName)
+                                // Replace the quote input with real quotes
+                                // replace the secret lastName and firstName inputs with temp strings
+                                // the temp strings can not be entered in on Android
+                                joke = value.getString("joke")
+                                        .replaceAll("&quot;", "\"")
+                                        .replaceAll("Chuck", "" + (char) 11)
+                                        .replaceAll("chuck", "" + (char) 6)
                                         .replaceAll("Norris", lastName)
-                                        .replaceAll("chuck", firstName.toLowerCase())
-                                        .replaceAll("norris", lastName.toLowerCase());
-                                Log.d(TAG, "Queued a " + currentJokeType + "joke from the api");
+                                        .replaceAll("norris", lastName.toLowerCase())
+                                        .replaceAll("" + (char) 11, firstName)
+                                        .replaceAll("" + (char) 6, firstName.toLowerCase());
                             } catch (Exception e) {
                                 Log.d(TAG, "OOF! COULD NOT GET JOKE:\n" + e.toString());
                             }
